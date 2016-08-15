@@ -1,0 +1,6 @@
+[submodule "python-subprocess32"]
+	path = python-subprocess32
+	url = https://github.com/google/python-subprocess32
+[submodule "multibuild"]
+	path = multibuild
+	url = https://github.com/matthew-brett/multibuild

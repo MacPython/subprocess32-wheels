@@ -1,0 +1,66 @@
+env:
+  global:
+      - REPO_DIR="python-subprocess32"
+      - BUILD_COMMIT=3.2.7
+      - PLAT=x86_64
+      - UNICODE_WIDTH=32
+      - BUILD_DEPENDS=
+      - TEST_DEPENDS=
+      - WHEELHOUSE_UPLOADER_USERNAME=travis-worker
+      # Following generated with
+      # travis encrypt -r MacPython/subprocess32-wheels WHEELHOUSE_UPLOADER_SECRET=<the api key>
+      - secure:
+          "fABAJ2tfjHSKayuQfhS6XRc3Auo1JrD22oITXY6l9+Dy9tEwwScW4Rcr9gfJJiIYt7q9ZiinnoMZn1zuFKlEXqczG+bXfI4SbY+7VhgVYoJpTtPeGsz3ik3Ngs6LQpY9QC5osI38wxa7rRQlrOvvFbiFU2FfSPAsTlmdTGtKqPrLNPYXm7gIJ9eyHLpyXDSmPRMdXzyYyj7Brr6jGPL/BWp0BfXdTJ0PnVTjZCGCuZFUSgYoYPSgvxObcKZGeg8dC7FDHQnRkKzGmlQN1ZZdZEgOtQ5WF4B4ZqehD2xkFxl/ReAJEcTM7SfcPnv6s++SroxLfK1q+B6AANlAlBwqNgy7PyX53Bwer7u7NWHC8NYJU6kP5irFhj5TfK1EtRvfoasB0gGq3PT+d3FGYaELl2zveA9RZ+UrA75AgdGE7Vjyx9MPFZjH60zJZuPjlLAgv376rIMxjHMd8Z0zTMM9BiQTNe1ntoFPJ6GWWx/dbM7svViwATaWzUzecdLJGjTffz00hxBtiGBVrFPFssuhACHbplaw60gAwDio8CaLH1Rd5Y+JFanRtBTNvdV8EdwVrmKmkW34PeJiRbVUtBULSFcyjvky65h0l1TrKFtl6dtDoSAXIz3FLpBN56Zq8Q9BuV0Ckfef9i9dgkfmnf5bwXZbetJ3GbeQeExHLp0lmEc=" 
+
+language: python
+# Default Python version is usually 2.7
+python: 3.5
+sudo: required
+dist: trusty
+services: docker
+
+matrix:
+  exclude:
+      # Exclude the default Python 3.5 build
+      - python: 3.5
+  include:
+    - os: linux
+      env:
+        - MB_PYTHON_VERSION=2.7
+    - os: linux
+      env:
+        - MB_PYTHON_VERSION=2.7
+        - UNICODE_WIDTH=16
+    - os: linux
+      env:
+        - MB_PYTHON_VERSION=2.7
+        - PLAT=i686
+    - os: linux
+      env:
+        - MB_PYTHON_VERSION=2.7
+        - PLAT=i686
+        - UNICODE_WIDTH=16
+    - os: osx
+      language: generic
+      env: MB_PYTHON_VERSION=2.7
+
+before_install:
+    - source multibuild/common_utils.sh
+    - source multibuild/travis_steps.sh
+    - before_install
+
+install:
+    # Maybe get and clean and patch source
+    - clean_code $REPO_DIR $BUILD_COMMIT
+    - build_wheel $REPO_DIR $PLAT
+
+script:
+    - install_run $PLAT
+
+after_success:
+    # Upload wheels to Rackspace container
+    - pip install wheelhouse-uploader
+    - python -m wheelhouse_uploader upload --local-folder
+          ${TRAVIS_BUILD_DIR}/wheelhouse/
+          --no-update-index
+          wheels
