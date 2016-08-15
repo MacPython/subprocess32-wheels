@@ -1,7 +1,7 @@
 env:
   global:
       - REPO_DIR="python-subprocess32"
-      - BUILD_COMMIT=3.2.7
+      - BUILD_COMMIT=master
       - PLAT=x86_64
       - UNICODE_WIDTH=32
       - BUILD_DEPENDS=
